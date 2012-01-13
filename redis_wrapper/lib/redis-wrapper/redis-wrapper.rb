@@ -6,11 +6,11 @@ module RedisWrapper
     end
     def method_missing(method, *args, &block)
       if @client.respond_to? method
-        options = get_options(*args) || {}
-        Entry.new(@client.send(method, *args #need to handle *args, find a way to determine what needs to be Entry.new()
-                                             #read redis API, suspect anything with more than a key should be zipped.
-        , &block), options).result
-        
+        options = get_options(args) || {}
+        key = get_key(args)
+        handle(args)
+        args = [key] + args if args
+        Entry.new(@client.send(method, args, &block), options).result
       else
         raise NameError, :message=> "method #{method} is not defined"
       end
@@ -23,6 +23,14 @@ module RedisWrapper
             args.pop
           end
         end
+      end
+      
+      def get_key(*args)
+        args.first.kind_of?(String) ? args.shift : nil
+      end
+      
+      def handle(*args)
+        args.each{|u| u = Entry.new(u).value} if args
       end
   end
 end
