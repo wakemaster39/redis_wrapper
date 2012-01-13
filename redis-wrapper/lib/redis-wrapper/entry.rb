@@ -5,6 +5,10 @@ module RedisWrapper
     FLAG_COMPRESSED = "0x2"
     DEFAULT_COMPRESS_LIMIT = 16 * 1024 #16 kilobytes
     
+    def self.option_keys
+      [:expire_in,:flags, :raw]
+    end
+    
     def initialize(value, options = {})
       @flags = options[:flags] || {}
       @value = value
