@@ -7,7 +7,7 @@ Gem::Specification.new do |s|
   s.version     = RedisWrapper::Rails::VERSION
   s.authors     = ["wakemaster39"]
   s.email       = ["wakemaster39@gmail.com"]
-  s.homepage    = ""
+  s.homepage    = "https://github.com/wakemaster39/redis_wrapper"
   s.summary     = %q{Handle rails specifc actions}
   s.description = %q{Adds support for a number of rails specific actions}
 

@@ -1,4 +1,4 @@
-require 'redis-wrapper/entry.rb'
+require 'redis_wrapper/entry.rb'
 require 'zlib'
 
 describe RedisWrapper::Entry do
