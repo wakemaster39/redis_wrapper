@@ -2,11 +2,11 @@ module RedisWrapper
   module Rails
     class LogSubscriber < ActiveSupport::LogSubscriber
       def self.runtime=(value)
-        Thread.current["sorl_runtime"] = value
+        Thread.current["redis_runtime"] = value
       end
 
       def self.runtime
-        Thread.current["sorl_runtime"] ||= 0
+        Thread.current["redis_runtime"] ||= 0
       end
 
       def self.reset_runtime

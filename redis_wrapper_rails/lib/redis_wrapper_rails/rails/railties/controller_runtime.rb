@@ -9,18 +9,17 @@ module RedisWrapper
         attr_internal :redis_runtime
 
         def cleanup_view_runtime
-          # TODO only if solr is connected? if not call to super
-
-          redis_rt_before_render = RedisWrapper::Rails::LogSubscriber.reset_runtime
+          #TODO: Call only if redis is connected
+          redis_rt_before_render = Rails::LogSubscriber.reset_runtime
           runtime = super
-          redis_rt_after_render = RedisWrapper::Rails::LogSubscriber.reset_runtime
+          redis_rt_after_render = Rails::LogSubscriber.reset_runtime
           self.redis_runtime = redis_rt_before_render + redis_rt_after_render
           runtime - redis_rt_after_render
         end
 
         def append_info_to_payload(payload)
           super
-          payload[:redis_runtime] = solr_runtime
+          payload[:redis_runtime] = redis_runtime
         end
 
         module ClassMethods
