@@ -1,6 +1,4 @@
 module RedisWrapper
-  require 'redis'
-  require 'redis_wrapper/entry'
   class RedisWrapper
     def initialize(options={})
       @client = Redis.new(options)
