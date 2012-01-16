@@ -164,26 +164,39 @@ describe RedisWrapper::Entry do
     end
   end
   
-  describe '#result' do
+  describe '#extracted_result' do
     before do
       @wrapper = RedisWrapper::Entry.new(nil)
+      @obj = Array.new
     end
     context 'should return original value if' do
       it 'marshaled' do
-        @wrapper.value = Marshal.dump(Array.new)
+        @wrapper.value = Marshal.dump(@obj)
         @wrapper.flags[:marshaled] = true
-        @wrapper.result.should eq(Array.new)
+        @wrapper.extracted_result.should eq(@obj)
       end
       it 'compressed' do
         @wrapper.value = Zlib::Deflate.deflate("test")
         @wrapper.flags[:compressed] = true
-        @wrapper.result.should eq("test")
+        @wrapper.extracted_result.should eq("test")
       end
       it 'compressed and marshaled' do
         @wrapper.value = Zlib::Deflate.deflate(Marshal.dump(Array.new))
         @wrapper.flags = {:compressed=>true,:marshaled=>true}
-        @wrapper.result.should eq(Array.new)
+        @wrapper.extracted_result.should eq(Array.new)
       end
+      it 'should clear flags' do
+      @wrapper.value = Zlib::Deflate.deflate(Marshal.dump(@bj)) + "0x10x2"
+      @wrapper.flags = {:compressed=>true, :marshaled=>true}
+      @wrapper.extracted_result
+      @wrapper.flags.should eq({:compressed=>false, :marshaled=>false})
+    end
+    it 'should change stored value' do
+      @wrapper = RedisWrapper::Entry.new(Marshal.dump(@obj)+"0x1")
+      @wrapper.value.should_not eq(@obj)
+      @wrapper.extracted_result
+      @wrapper.value.should eq(@obj)
+    end
     end
   end
   
@@ -195,23 +208,23 @@ describe RedisWrapper::Entry do
     it 'should return false if :raw is set to true even if over threshold' do
       @wrapper = RedisWrapper::Entry.new(nil,{:raw=>true})
       @wrapper.value = @teststring
-      @wrapper.send(:should_compress?).should eq(false)
+      @wrapper.send(:should_compress?, @wrapper.value).should eq(false)
     end
     it 'should return true if over threshold without bypass' do
       @wrapper.value = @teststring
-      @wrapper.send(:should_compress?).should eq(true)
+      @wrapper.send(:should_compress?, @wrapper.value).should eq(true)
     end
     it 'should accept a change in thershold in object creation' do
       @wrapper = RedisWrapper::Entry.new(nil,{:compression_threshold=>100000})
       @wrapper.value = @teststring
-      @wrapper.send(:should_compress?).should eq(false)
+      @wrapper.send(:should_compress?, @wrapper.value).should eq(false)
     end
     it 'should return true if greater than threshold' do
       @wrapper.value = @teststring
-      @wrapper.send(:should_compress?).should eq(true)
+      @wrapper.send(:should_compress?, @wrapper.value).should eq(true)
     end
     it 'should not compress nil values' do
-      @wrapper.send(:should_compress?).should eq(false)
+      @wrapper.send(:should_compress?, @wrapper.value).should eq(false)
     end
   end
   
@@ -256,26 +269,11 @@ describe RedisWrapper::Entry do
         @wrapper.flags.should include(:compressed=>true, :marshaled=>true)
         @wrapper.value.should eq(@teststring)
       end
-      it 'should marshal and compress if no flags extracted and :raw is false' do
-        @wrapper = RedisWrapper::Entry.new(@teststring, :compression_threshold=>2)
-        @wrapper.flags.should include(:compressed=>true, :marshaled=>true)
-        @wrapper.value.should eq(Zlib::Deflate.deflate(Marshal.dump(@teststring)))
-      end
-      it 'should set no flags if :raw true and take no action' do
-        @wrapper = RedisWrapper::Entry.new(@teststring, :compression_threshold=>2, :raw=>true)
-        @wrapper.value.should eq(@teststring)
-        @wrapper.flags.should eq({})
-      end
     end
     context 'passed an object' do
       before do
         @obj = Array.new
         @options = {:compression_threshold=>0}
-      end
-      it 'should marshal and compress objects' do
-        @wrapper = RedisWrapper::Entry.new(@obj,@options)
-        @wrapper.value.should eq(Zlib::Deflate.deflate(Marshal.dump(@obj)))
-        @wrapper.flags.should eq(:compressed=>true,:marshaled=>true)
       end
       it 'should respect the raw flag' do
         @wrapper = RedisWrapper::Entry.new(@obj,@options.merge(:raw=>true))
@@ -302,23 +300,57 @@ describe RedisWrapper::Entry do
     end
   end
   
-  describe "#result" do
+  describe "#flags_string" do
     before do
-      @options= {:compression_threshold=>0}
+      @wrapper = RedisWrapper::Entry.new(nil)
+    end
+    it 'should return 0x1 if marshaled' do
+      @wrapper.flags = {:marshaled => true}
+      @wrapper.flags_string.should eq("0x1")
+    end
+    it 'should return 0x2 if compressed' do
+      @wrapper.flags = {:compressed => true}
+      @wrapper.flags_string.should eq("0x2")
+    end
+    it 'should return 0x10x2 if marshaled and compressed' do
+      @wrapper.flags = {:compressed => true, :marshaled => true}
+      @wrapper.flags_string.should eq("0x10x2")
+    end
+  end
+
+  describe "#prepare" do
+    before do
       @obj = Array.new
-      @wrapper = RedisWrapper::Entry.new(@obj,@options)
+      @wrapper = RedisWrapper::Entry.new(@obj, :compression_threshold => 0)
     end
-    it 'should decompress and demarshal value' do
-      @wrapper.result.should eq(@obj)
+    it "should marshal when needed" do
+      @wrapper.should_receive(:marshal).with(@obj)
+      @wrapper.prepare(@obj)
     end
-    it 'should clear flags' do
-      @wrapper.flags.should eq(:compressed=>true,:marshaled=>true)
-      @wrapper.flags.should eq({})
+    it "should compress when needed" do
+      @wrapper.should_receive(:compress).with(Marshal.dump(@obj))
+      @wrapper.prepare(@obj)
     end
-    it 'should change stored value' do
-      @wrapper.value.should_not eq(@obj)
-      @wrapper.result
-      @wrapper.value.should eq(@bj)
+    it "should return nil if passed nil" do
+      @wrapper.prepare(nil).should eq(nil)
+    end
+  end
+
+  describe "#prepared_result" do
+    before do
+      @obj = Array.new
+      @wrapper = RedisWrapper::Entry.new(@obj, :compression_threshold => 0)
+    end
+    it 'should return a string' do
+      @wrapper.prepared_result.class.should eq(String)
+    end
+    it 'should be compressed and marshalled' do
+      @wrapper.prepared_result.should eq(Zlib::Deflate.deflate(Marshal.dump(@obj))+"0x10x2")
+    end
+    it 'should have flags' do
+      @flags = RedisWrapper::Entry.new(@wrapper.prepared_result).flags
+      @flags.should_not eq({})
+      @flags.class.should eq(Hash)
     end
   end
 end

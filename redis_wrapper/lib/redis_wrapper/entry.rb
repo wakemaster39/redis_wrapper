@@ -14,11 +14,25 @@ module RedisWrapper
       @value = value
       @options = options
       flag_extraction if @value.class == String
-      @value = compress(marshal(@value)) if @flags == {} && !options[:raw]
     end
     
-    def result
+    def extracted_result
       @value = demarshal(decompress(@value))
+    end
+
+    def prepared_result
+      prepare(@value) + flags_string
+    end
+
+    def prepare(value)
+      compress(marshal(value)) if value
+    end
+
+    def flags_string
+      string = ""
+      string += FLAG_MARSHALED if @flags[:marshaled]
+      string += FLAG_COMPRESSED if @flags[:compressed]
+      string
     end
     
     def demarshal(val)
@@ -38,7 +52,7 @@ module RedisWrapper
     end
     
     def compress(val)
-      if should_compress?
+      if should_compress?(val) && !compressed?
         @flags[:compressed] = true
         return Zlib::Deflate.deflate(val)
       end
@@ -46,7 +60,7 @@ module RedisWrapper
     end
     
     def marshal(val)
-      if val
+      if val && !marshaled?
         @flags[:marshaled] = true
         Marshal.dump(val)
       end
@@ -74,10 +88,10 @@ module RedisWrapper
       def marshaled?
         @flags[:marshaled] == true
       end
-      def should_compress?
-        unless @options[:raw] || @value.nil?
+      def should_compress?(val)
+        unless @options[:raw] || val.nil?
           compression_threshold = @options[:compression_threshold] || DEFAULT_COMPRESS_LIMIT
-          return true if @value.size >= compression_threshold
+          return true if val.size >= compression_threshold
         end
         false
       end
