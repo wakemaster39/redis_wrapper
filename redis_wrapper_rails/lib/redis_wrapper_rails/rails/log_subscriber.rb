@@ -19,16 +19,11 @@ module RedisWrapper
         return unless logger.debug?
 
         name = '%s (%.1fms)' % ["Redis Request", event.duration]
-        
-        ### FIX THIS TO BE REDIS SPECIFIC
-        # produces: path=/select parameters={fq: ["type:Tag"], q: rossi, fl: * score, qf: tag_name_text, defType: dismax, start: 0, rows: 20}
-        parameters = event.payload[:parameters].map { |k, v| "#{k}: #{color(v, BOLD, true)}" }.join(', ')
-        request = "path=#{event.payload[:path]} parameters={#{parameters}}"
 
-        debug "  #{color(name, GREEN, true)}  [ #{request} ]"
+        debug "  #{color(name, RED, true)}  [ method: #{event.payload[:method]}  #{"| key: " + event.payload[:key] if event.payload[:key].present?}]"
       end
     end
   end
 end
 
-Sunspot::Rails::LogSubscriber.attach_to :rsolr
+RedisWrapper::Rails::LogSubscriber.attach_to :redis

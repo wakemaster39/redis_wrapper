@@ -1,6 +1,6 @@
 # -*- encoding: utf-8 -*-
 $:.push File.expand_path("../lib", __FILE__)
-require "redis_wrapper_rails/version"
+require "redis_wrapper_rails/rails/version"
 
 Gem::Specification.new do |s|
   s.name        = "redis_wrapper_rails"

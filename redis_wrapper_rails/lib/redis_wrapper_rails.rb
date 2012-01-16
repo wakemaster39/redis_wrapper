@@ -1,7 +1,2 @@
-require "redis-wrapper-rails/version"
-
-module RedisWrapper
-  module Rails
-    # Your code goes here...
-  end
-end
+require 'redis_wrapper_rails/rails'
+require 'redis_wrapper_rails/rails/railtie'
