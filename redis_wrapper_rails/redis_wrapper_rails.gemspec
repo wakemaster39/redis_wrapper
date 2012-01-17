@@ -33,9 +33,11 @@ Gem::Specification.new do |s|
       s.add_runtime_dependency(%q<redis_wrapper>, RedisWrapper::VERSION)
       s.add_development_dependency(%q<rspec>, [">= 0"])
     else
+      s.add_dependency(%q<redis_wrapper>, RedisWrapper::VERSION)
       s.add_dependency(%q<rspec>, [">= 0"])
     end
   else
+    s.add_dependency(%q<redis_wrapper>, RedisWrapper::VERSION)
     s.add_dependency(%q<rspec>, [">= 0"])
   end
 end
