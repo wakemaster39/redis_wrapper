@@ -16,7 +16,7 @@ Gem::Specification.new do |s|
   s.test_files = `git ls-files -- {spec,spec,features}/*`.split("\n")
   s.require_paths = ["lib"]
 
-  s.homepage = "http://github.com/wakemaster39/redis-wrapper"
+  s.homepage = "http://github.com/wakemaster39/redis_wrapper"
   s.licenses = ["MIT"]
   s.rubygems_version = "1.8.10"
   s.summary = "High level wrapper around redis API"
