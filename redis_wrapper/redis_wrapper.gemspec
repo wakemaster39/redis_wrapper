@@ -25,6 +25,7 @@ Gem::Specification.new do |s|
     "lib/redis_wrapper/entry.rb",
     "lib/redis_wrapper/redis_wrapper.rb",
     "lib/redis_wrapper/version.rb",
+    "redis_wrapper.gemspec",
     "tests/rspec/entry_spec.rb",
     "tests/rspec/redis_wrapper_spec.rb"
   ]
