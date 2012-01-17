@@ -1,5 +1,4 @@
 require 'redis_wrapper'
-#require "redis_wrapper_rails/version"
 
 module RedisWrapper
   module Rails

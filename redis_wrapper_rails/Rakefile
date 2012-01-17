@@ -1,1 +1,31 @@
-require "bundler/gem_tasks"
+# encoding: utf-8
+
+require 'rubygems'
+require 'bundler'
+begin
+  Bundler.setup(:default, :development)
+rescue Bundler::BundlerError => e
+  $stderr.puts e.message
+  $stderr.puts "Run `bundle install` to install missing gems"
+  exit e.status_code
+end
+require 'rake'
+
+require 'jeweler'
+require  File.expand_path('../../redis_wrapper/lib/redis_wrapper/version.rb', __FILE__)
+Jeweler::Tasks.new do |gem|
+  gem.name = "redis_wrapper_rails"
+  gem.homepage = "http://github.com/wakemaster39/redis-wrapper"
+  gem.license = "MIT"
+  gem.summary = %Q{Rails specific bindings for redis_wrapper}
+  gem.description = %Q{Provides rails specific functionality for redis-wrapper. Display's key and method calls to redis along with overall access times in the controller logs.'}
+  gem.email = "wakemaster39@gmail.com"
+  gem.authors = ["wakemaster39"]
+  gem.version = RedisWrapper::VERSION
+end
+Jeweler::RubygemsDotOrgTasks.new
+
+task :default => :spec
+task :spec do
+  exec "rspec spec"
+end
