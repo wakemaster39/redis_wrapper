@@ -1,4 +1,9 @@
 source "http://rubygems.org"
 
-# Specify your gem's dependencies in redis-wrapper.gemspec
-gemspec
+gem 'redis', '~>2.2.1'
+
+group :development do
+  gem 'rspec'
+  gem 'bundler'
+  gem 'jeweler'
+end

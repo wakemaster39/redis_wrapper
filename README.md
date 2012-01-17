@@ -1,0 +1,3 @@
+# Redis Wrapper
+
+Redis Wrapper is built on top of the [redis-rb](https://github.com/ezmobius/redis-rb) library as a communication method between ruby code and redis. Redis-rb handles all the connection to the database store, while redis_wrapper supplies a more convient interface on which to communicate. All methods available via redis-rb are accessible by the wrapper, but allows objects other than strings to be passed in.

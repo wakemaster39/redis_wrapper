@@ -1,1 +1,30 @@
-require "bundler/gem_tasks"
+# encoding: utf-8
+
+require 'rubygems'
+require 'bundler'
+begin
+  Bundler.setup(:default, :development)
+rescue Bundler::BundlerError => e
+  $stderr.puts e.message
+  $stderr.puts "Run `bundle install` to install missing gems"
+  exit e.status_code
+end
+require 'rake'
+
+require 'jeweler'
+Jeweler::Tasks.new do |gem|
+  # gem is a Gem::Specification... see http://docs.rubygems.org/read/chapter/20 for more options
+  gem.name = "redis_wrapper"
+  gem.homepage = "http://github.com/wakemaster39/redis-wrapper"
+  gem.license = "MIT"
+  gem.summary = %Q{High level wrapper around redis API}
+  gem.description = %Q{A high level wrapper around the redis-rb gem and API. Designed to be a drop in replacement for Redis class while handling object marshaling and compression, setting key expiries, and namespacing your keys}
+  gem.email = "wakemaster39@gmail.com"
+  gem.authors = ["wakemaster39"]
+end
+Jeweler::RubygemsDotOrgTasks.new
+
+task :default => :spec
+task :spec do
+  exec "rspec spec"
+end
