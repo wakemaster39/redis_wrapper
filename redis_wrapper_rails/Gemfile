@@ -1,9 +1,0 @@
-source "http://rubygems.org"
-
-gem 'redis_wrapper', "~>0.1.0"
-
-group :development do
-  gem 'rspec'
-  gem 'bundler'
-  gem 'jeweler'
-end

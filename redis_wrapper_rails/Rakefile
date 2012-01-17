@@ -5,10 +5,13 @@ if File.exist?(redis_wrapper_lib = File.expand_path(File.join(File.dirname(__FIL
   $: << redis_wrapper_lib
 end
 
-task :default => :spec
-task :spec do
-  exec "rspec spec"
+desc "Run all tests"
+RSpec::Core::RakeTask.new(:spec) do |t|
+  t.rspec_opts = '--format documentation'
+  t.ruby_opts = "-W1"
 end
+
+task :default => :spec
 
 task :environment do
 end
