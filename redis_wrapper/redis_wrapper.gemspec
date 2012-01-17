@@ -21,11 +21,10 @@ Gem::Specification.new do |s|
     "MIT-LICENSE",
     "README.md",
     "Rakefile",
-    "VERSION",
     "lib/redis_wrapper.rb",
     "lib/redis_wrapper/entry.rb",
     "lib/redis_wrapper/redis_wrapper.rb",
-    "redis_wrapper.gemspec",
+    "lib/redis_wrapper/version.rb",
     "tests/rspec/entry_spec.rb",
     "tests/rspec/redis_wrapper_spec.rb"
   ]

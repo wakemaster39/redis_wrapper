@@ -10,6 +10,7 @@ rescue Bundler::BundlerError => e
   exit e.status_code
 end
 require 'rake'
+require "./lib/redis_wrapper/version"
 
 require 'jeweler'
 Jeweler::Tasks.new do |gem|
@@ -20,6 +21,7 @@ Jeweler::Tasks.new do |gem|
   gem.description = %Q{A high level wrapper around the redis-rb gem and API. Designed to be a drop in replacement for Redis class while handling object marshaling and compression, setting key expiries, and namespacing your keys}
   gem.email = "wakemaster39@gmail.com"
   gem.authors = ["wakemaster39"]
+  gem.version = RedisWrapper::VERSION
 end
 Jeweler::RubygemsDotOrgTasks.new
 
