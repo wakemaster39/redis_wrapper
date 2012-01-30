@@ -16,7 +16,7 @@ task :release do
 
   FileUtils.cd 'redis_wrapper_rails' do
     system "gem build redis_wrapper_rails.gemspec"
-    system "gem push redis_wrapper_rails-#RedisWrapper::VERSION}.gem"
+    system "gem push redis_wrapper_rails-#{RedisWrapper::VERSION}.gem"
     FileUtils.rm("redis_wrapper_rails-#{RedisWrapper::VERSION}.gem")
   end
 end
